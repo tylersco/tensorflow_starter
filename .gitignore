@@ -102,3 +102,15 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# Other
+.vscode
+
+results/*
+!results/.gitkeep
+
+trained_models/*
+!trained_models/.gitkeep
+
+datasets/*
+!datasets/.gitkeep
