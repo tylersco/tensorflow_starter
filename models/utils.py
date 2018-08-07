@@ -55,7 +55,10 @@ def _sigmoid(x):
 def _tanh(x):
     return tf.nn.tanh(x)
 
-def _conv(name, x, filter_size, in_size, out_size, stride, padding='SAME', bias=True, reuse=None):
+def _softmax(x):
+    return tf.nn.softmax(x)
+
+def _conv(name, x, filter_size, in_size, out_size, stride, padding='SAME', bias=True, reuse=None, weight_decay=None):
     with tf.variable_scope(name, reuse=reuse):
         n = filter_size * filter_size * out_size
         weights = tf.get_variable(
@@ -63,7 +66,7 @@ def _conv(name, x, filter_size, in_size, out_size, stride, padding='SAME', bias=
             tf.float32, initializer=tf.random_normal_initializer(stddev=np.sqrt(2.0 / n))
         )
 
-        res = tf.conv2d(x, weights, _stride(stride), padding=padding)
+        res = tf.nn.conv2d(x, weights, _stride(stride), padding=padding)
 
         if bias:
             biases = tf.get_variable(
@@ -72,9 +75,13 @@ def _conv(name, x, filter_size, in_size, out_size, stride, padding='SAME', bias=
             )
             res += biases
 
+        if weight_decay:
+            wd = tf.nn.l2_loss(weights) * weight_decay
+            tf.add_to_collection('weight_decay', wd)
+
     return res
 
-def _fully_connected(name, x, out_size, reuse=None):
+def _fully_connected(name, x, out_size, reuse=None, weight_decay=None):
     with tf.variable_scope(name, reuse=reuse):
         # NOTE: Factor used in initializer may need to be tuned
         weights = tf.get_variable(
@@ -84,4 +91,9 @@ def _fully_connected(name, x, out_size, reuse=None):
         biases = tf.get_variable(
             'fc_biases', [out_size], initializer=tf.zeros_initializer()
         )
+
+        if weight_decay:
+            wd = tf.nn.l2_loss(weights) * weight_decay
+            tf.add_to_collection('weight_decay', wd)
+
         return tf.nn.xw_plus_b(x, weights, biases)

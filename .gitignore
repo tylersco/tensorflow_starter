@@ -104,10 +104,9 @@ venv.bak/
 .mypy_cache/
 
 # Other
-.vscode
+.DS_Store
 
-results/*
-!results/.gitkeep
+.vscode
 
 trained_models/*
 !trained_models/.gitkeep

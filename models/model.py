@@ -4,14 +4,18 @@ Adapted from https://danijar.com/structuring-your-tensorflow-models/
 
 from abc import ABC, abstractmethod
 
+from .utils import AttrDict
+
 class Model(ABC):
 
     def __init__(self):
         super().__init__()
 
-    @abstractmethod
     def get_config(self, config):
-        pass
+        c = AttrDict()
+        for k, v in config.items():
+            c[k] = v
+        return c
 
     @abstractmethod
     def prediction(self):
